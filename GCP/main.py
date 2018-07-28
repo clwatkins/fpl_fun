@@ -6,6 +6,8 @@ Currently includes:
 import requests as rq
 from flask import Request
 
+from gcloud import storage
+
 import logging
 import datetime as dt
 from io import BytesIO
@@ -16,7 +18,7 @@ FPL_BUCKET_NAME = 'fpl_fun'
 def get_fpl_data(req: Request):
     """Cloud function to save data from FPL website.
 
-    Writes JSON to Google Cloud storage.
+    Writes raw JSON to Google Cloud storage.
 
     Args:
       req: Flask Request automatically passed by GCP Functions. Is ignored.
@@ -30,10 +32,6 @@ def get_fpl_data(req: Request):
 
     response = rq.get('https://fantasy.premierleague.com/drf/bootstrap-static')
     fpl_blob_name = 'fpl_data_' + dt.datetime.utcnow().isoformat()
-
-    print(fpl_blob_name)
-
-    from gcloud import storage
 
     storage_client = storage.Client()
     fpl_bucket = storage_client.bucket(FPL_BUCKET_NAME)

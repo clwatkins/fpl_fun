@@ -22,6 +22,10 @@ def create_requirements_txt():
 
 
 def create_get_fpl_data():
+    """Deploys get_fpl_data function to GCP Functions.
+
+    :return: CompletedProcess data type
+    """
     completed_process = subprocess.run(
         f'gcloud beta functions deploy {main.get_fpl_data.__name__} --runtime=python37 --trigger-http '
         f'--source={os.path.dirname(main.__file__)} --project=fpl-fun --entry-point={main.get_fpl_data.__name__}'
