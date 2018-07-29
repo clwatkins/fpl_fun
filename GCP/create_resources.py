@@ -14,9 +14,16 @@ def create_requirements_txt():
 
     os.chdir(os.path.dirname(main.__file__))
 
+    try:
+        os.remove('requirements.txt')
+    except FileNotFoundError:
+        pass
+
     completed_process = subprocess.run(
         f'pip freeze >> requirements.txt', shell=True
     )
+
+    print('Requirements.txt created...')
 
     return completed_process
 
@@ -28,9 +35,26 @@ def create_get_fpl_data():
     """
     completed_process = subprocess.run(
         f'gcloud beta functions deploy {main.get_fpl_data.__name__} --runtime=python37 --trigger-http '
-        f'--source={os.path.dirname(main.__file__)} --project=fpl-fun --entry-point={main.get_fpl_data.__name__}'
+        f'--source={os.path.dirname(main.__file__)} --project=fpl-fun --entry-point={main.get_fpl_data.__name__} '
         f'--env-vars-file .env.yaml',
     shell=True)
+
+    return completed_process
+
+
+def create_create_gcp_tables():
+    """Deploys write_gcp_tables_pubsub function to GCP Functions.
+
+    :return: CompletedProcess data type
+    """
+
+    completed_process = subprocess.run(
+        f'gcloud beta functions deploy {main.write_gcp_tables_pubsub.__name__} --runtime=python37 '
+        f'--source={os.path.dirname(main.__file__)} --project=fpl-fun '
+        f'--entry-point={main.write_gcp_tables_pubsub.__name__} '
+        f'--trigger-resource {main.FPL_BUCKET_NAME} --trigger-event google.storage.object.finalize '
+        f'--env-vars-file .env.yaml',
+        shell=True)
 
     return completed_process
 
@@ -48,11 +72,17 @@ def create_fpl_storage_bucket():
         bucket_name = main.FPL_BUCKET_NAME
         pass
 
-    print(f'Bucket created {bucket_name}')
+    print(f'Bucket created {bucket_name}...')
 
 
 if __name__ == '__main__':
-    create_fpl_storage_bucket()
+    # create_requirements_txt()
+    # print('\n')
 
-    create_requirements_txt()
+    os.chdir(os.path.dirname(main.__file__))
+
+    create_fpl_storage_bucket()
+    print('\n')
     create_get_fpl_data()
+    print('\n')
+    create_create_gcp_tables()

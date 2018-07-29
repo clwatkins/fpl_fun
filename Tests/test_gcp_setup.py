@@ -22,6 +22,10 @@ class TestGCP(unittest.TestCase):
         cloud_funcs_client = googleapiclient.discovery.build('cloudfunctions', 'v1', credentials=self.creds)
         r = cloud_funcs_client.projects().locations().functions().list(parent='projects/*/locations/*')
         print(r.to_json())
+        pass
+
+    def test_gcp_writer(self):
+        pass
 
 
 if __name__ == '__main__':
