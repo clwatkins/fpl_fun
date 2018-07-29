@@ -28,7 +28,7 @@ class XmlSoccerRequest(object):
         self.api_url = 'http://www.xmlsoccer.com/FootballDataDemo.asmx/'
         self.base_params = {'ApiKey': self.api_key}
 
-    def get(self, method='GetAllLeagues', **kwargs):
+    def get(self, method:str='GetAllLeagues', **kwargs) -> typing.List[typing.Dict]:
         r = rq.get(self.api_url + method,
                    params={**self.base_params, **kwargs})
 
@@ -37,7 +37,8 @@ class XmlSoccerRequest(object):
         else:
             return self._process_xml(r)
 
-    def _process_xml(self, response: rq.Response):
+    @staticmethod
+    def _process_xml(response: rq.Response) -> typing.List[typing.Dict]:
         data = []
 
         try:
@@ -56,7 +57,7 @@ class XmlSoccerRequest(object):
         return data
 
 
-def get_season_matches(league_code, season_date_string):
+def get_season_matches(league_code: str, season_date_string: str) -> pd.DataFrame:
     """Downloads matches from a particular competition and season into a dataframe.
 
     # Common competition codes
@@ -71,8 +72,8 @@ def get_season_matches(league_code, season_date_string):
     :return: df containing all of the competition season match information
     """
     season_matches = XmlSoccerRequest().get('GetFixturesByLeagueAndSeason',
-                                              league=league_code,
-                                              seasonDateString=season_date_string)
+                                            league=league_code,
+                                            seasonDateString=season_date_string)
 
     season_matches_df = pd.DataFrame.from_records(season_matches)
     season_matches_df['MatchDate'] = pd.to_datetime(season_matches_df.Date)
@@ -82,7 +83,7 @@ def get_season_matches(league_code, season_date_string):
     return season_matches_df
 
 
-def process_season_matches(season_matches_df):
+def process_season_matches(season_matches_df: pd.DataFrame) -> typing.Tuple[pd.DataFrame, typing.Any]:
     """Processes raw season match data into parsable match and table data.
 
     :param season_matches_df: Dataframe as returned by get_season_matches function
@@ -91,16 +92,17 @@ def process_season_matches(season_matches_df):
     """
 
     def create_table_records(row):
+        # TODO handle null values better (don't contaminate df)
         home_row_data = dict()
         home_row_data['TeamName'] = row.HomeTeam
         home_row_data['HomeOrAway'] = 'Home'
-        home_row_data['GoalsFor'] = row.HomeGoals
-        home_row_data['GoalsAgainst'] = row.AwayGoals
-        home_row_data['MatchDay'] = row.Round
+        home_row_data['GoalsFor'] = float(row.HomeGoals)
+        home_row_data['GoalsAgainst'] = float(row.AwayGoals)
+        home_row_data['MatchDay'] = float(row.Round)
         home_row_data['MatchId'] = row.Id
-        home_row_data['GoalDiff'] = row.HomeGoals - row.AwayGoals
+        home_row_data['GoalDiff'] = float(row.HomeGoals) - float(row.AwayGoals)
         home_row_data['GamesPlayed'] = 1
-        home_row_data['CompetitionSeason'] = row.Season
+        home_row_data['CompetitionSeason'] = row.CompetitionSeason
         home_row_data['CompetitionName'] = row.CompetitionName
         home_row_data['MatchDate'] = row.MatchDate
 
@@ -119,14 +121,14 @@ def process_season_matches(season_matches_df):
         # repeat for away team
         away_row_data = dict()
         away_row_data['TeamName'] = row.AwayTeam
-        away_row_data['AwayOrAway'] = 'Away'
-        away_row_data['GoalsFor'] = row.AwayGoals
-        away_row_data['GoalsAgainst'] = row.HomeGoals
-        away_row_data['MatchDay'] = row.Round
+        away_row_data['HomeOrAway'] = 'Away'
+        away_row_data['GoalsFor'] = float(row.AwayGoals)
+        away_row_data['GoalsAgainst'] = float(row.HomeGoals)
+        away_row_data['MatchDay'] = float(row.Round)
         away_row_data['MatchId'] = row.Id
-        away_row_data['GoalDiff'] = row.AwayGoals - row.HomeGoals
+        away_row_data['GoalDiff'] = float(row.AwayGoals) - float(row.HomeGoals)
         away_row_data['GamesPlayed'] = 1
-        away_row_data['CompetitionSeason'] = row.Season
+        away_row_data['CompetitionSeason'] = row.CompetitionSeason
         away_row_data['CompetitionName'] = row.CompetitionName
         away_row_data['MatchDate'] = row.MatchDate
 
@@ -144,16 +146,12 @@ def process_season_matches(season_matches_df):
 
         return [home_row_data, away_row_data]
 
-    table_df_deep_list = season_matches_df.apply(create_table_records, axis=1)
+    season_matches_dropped_df = season_matches_df.dropna(thresh=10)  # drop only records that are substantively blank
+    table_df_deep_list = season_matches_dropped_df.apply(create_table_records, axis=1)
     table_df_flat_list = [l for sublist in table_df_deep_list for l in sublist]
     table_df = pd.DataFrame.from_records(table_df_flat_list)
 
-    grouped_table_df = table_df.groupby(['MatchDay', 'TeamName']).max().groupby('TeamName').cumsum()
+    grouped_table_df = table_df.groupby(['MatchDay', 'TeamName']).sum().groupby('TeamName').cumsum()\
+        .sort_values(by=['MatchDay', 'Points', 'GoalDiff'])
 
     return table_df, grouped_table_df
-
-
-def time_between_fixtures(season_matches_dfs: typing.List[pd.DataFrame]):
-    df_concat = pd.concat(season_matches_dfs)
-
-    sorted_df = df_concat.groupby(['TeamName', 'MatchDate']).max().sort_values(by='MatchDate', ascending=True)
