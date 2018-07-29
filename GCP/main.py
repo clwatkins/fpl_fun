@@ -73,17 +73,23 @@ def write_gcp_tables_pubsub(data, context):
     blob_data_pointer = fpl_bucket.get_blob(blob_name)
     blob_data_json = json.loads(blob_data_pointer.download_as_string())
 
+    logging.info('Successfully loaded blob data')
+
     teams_df = pd.DataFrame.from_records(blob_data_json['teams'])
     players_df = pd.DataFrame.from_records(blob_data_json['elements'])
     events_df = pd.DataFrame.from_records(blob_data_json['events'])
     fixtures_df = pd.DataFrame.from_records(blob_data_json['next_event_fixtures'])
 
+    logging.info('Successfully created dataframes')
+
     table_names = ['teams', 'players', 'events', 'fixtures']
+    today = dt.datetime.utcnow().date()
 
     for d, df in enumerate([teams_df, players_df, events_df, fixtures_df]):
-        df['date_created'] = dt.datetime.utcnow().date().isoformat()
+        df['date_created'] = today.isoformat()
         df['current_event'] = blob_data_json['current-event']
-        df.to_gbq(f"{table_names[d]}.event_{blob_data_json['current-event']}",
+        df.to_gbq(f"{table_names[d]}.{today.year}_event_{blob_data_json['current-event']}",
                   project_id=FPL_PROJECT_ID, if_exists='replace')
 
+    logging.info('Wrote dataframes to GBQ')
     return True
