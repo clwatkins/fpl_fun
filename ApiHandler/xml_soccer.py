@@ -75,15 +75,15 @@ def get_season_matches(league_code: str, season_date_string: str) -> pd.DataFram
                                             league=league_code,
                                             seasonDateString=season_date_string)
 
-    season_matches_df = pd.DataFrame.from_records(season_matches)
-    season_matches_df['MatchDate'] = pd.to_datetime(season_matches_df.Date)
-    season_matches_df['CompetitionSeason'] = season_date_string
-    season_matches_df['CompetitionName'] = season_matches[0]['League']
+    season_detail_df = pd.DataFrame.from_records(season_matches)
+    season_detail_df['MatchDate'] = pd.to_datetime(season_detail_df.Date)
+    season_detail_df['CompetitionSeason'] = season_date_string
+    season_detail_df['CompetitionName'] = season_matches[0]['League']
 
-    return season_matches_df
+    return season_detail_df
 
 
-def process_season_matches(season_matches_df: pd.DataFrame) -> typing.Tuple[pd.DataFrame, typing.Any]:
+def process_season_matches(season_detail_df: pd.DataFrame):
     """Processes raw season match data into parsable match and table data.
 
     :param season_matches_df: Dataframe as returned by get_season_matches function
@@ -96,6 +96,7 @@ def process_season_matches(season_matches_df: pd.DataFrame) -> typing.Tuple[pd.D
         home_row_data = dict()
         home_row_data['TeamName'] = row.HomeTeam
         home_row_data['HomeOrAway'] = 'Home'
+        home_row_data['MatchOpponent'] = row.AwayTeam
         home_row_data['GoalsFor'] = float(row.HomeGoals)
         home_row_data['GoalsAgainst'] = float(row.AwayGoals)
         home_row_data['MatchDay'] = float(row.Round)
@@ -122,6 +123,7 @@ def process_season_matches(season_matches_df: pd.DataFrame) -> typing.Tuple[pd.D
         away_row_data = dict()
         away_row_data['TeamName'] = row.AwayTeam
         away_row_data['HomeOrAway'] = 'Away'
+        away_row_data['MatchOpponent'] = row.HomeTeam
         away_row_data['GoalsFor'] = float(row.AwayGoals)
         away_row_data['GoalsAgainst'] = float(row.HomeGoals)
         away_row_data['MatchDay'] = float(row.Round)
@@ -146,12 +148,12 @@ def process_season_matches(season_matches_df: pd.DataFrame) -> typing.Tuple[pd.D
 
         return [home_row_data, away_row_data]
 
-    season_matches_dropped_df = season_matches_df.dropna(thresh=10)  # drop only records that are substantively blank
-    table_df_deep_list = season_matches_dropped_df.apply(create_table_records, axis=1)
-    table_df_flat_list = [l for sublist in table_df_deep_list for l in sublist]
+    season_dropped_df = season_detail_df.dropna(thresh=10)  # drop only records that are substantively blank
+    matches_df = season_dropped_df.apply(create_table_records, axis=1)
+    table_df_flat_list = [l for sublist in matches_df for l in sublist]
     table_df = pd.DataFrame.from_records(table_df_flat_list)
 
-    grouped_table_df = table_df.groupby(['MatchDay', 'TeamName']).sum().groupby('TeamName').cumsum()\
+    table_grouped_df = table_df.groupby(['MatchDay', 'TeamName']).sum().groupby('TeamName').cumsum()\
         .sort_values(by=['MatchDay', 'Points', 'GoalDiff'])
 
-    return table_df, grouped_table_df
+    return matches_df, table_df, table_grouped_df
