@@ -1,14 +1,17 @@
 import unittest
+import json
 
-from GCP.main import get_fpl_data
+from gcp.main import _fpl_downloader
 
 
 class TestCloudFunctions(unittest.TestCase):
-    def setUp(self):
-        pass
 
-    def test_fpl_api_function(self):
-        self.assertIsInstance(get_fpl_data(req=None), str)
+    def test_fpl_downloader(self):
+        fpl_response = _fpl_downloader()
+        fpl_json = json.loads(fpl_response)
+
+        self.assertIsInstance(fpl_response, bytes)
+        self.assertIn('teams', fpl_json.keys())
 
 
 if __name__ == '__main__':

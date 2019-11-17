@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "fpl-fun",
+  "private_key_id": "61cb6bb75464b43dcb39c71d4a56a5e2f3faaf14",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC3Uh5kJUOORY8e\n5cjIDqUYxrA+w/lxA//5Pl7pf5faoYO5HRrW0C0ChqiKqUXiWo4l3AF5neO0g9x8\nqi+p20GSR53PNrXhsGA4C8ZuwMUUVNOCTppcCZoLtxVomeKcFsFpxjn1L8w/T8H6\ns5k8rKokNR43DIyn15uzFKOL7+QmUos9kmTFbxM3KwLDvwJdcoTL/9IkijIve2S4\n1isPEGE20r60f6WZWreS6ae/bVMsS/IHt9X+66F8s5XmsX+7/WAkVPBTtaT2bmlJ\nlDyizYxBD5IKXIf65R6Sl2V/DQQIJ/D1ieiVBkWsxk4NDxMhS6zuUYvXeFTbYEit\nB76vMkMFAgMBAAECggEAD7Xlbd61re0vKU43CVIb+wYYF6Dy8SkPGFyshKVPLcj2\nwXgJk0xO9y70JcIA/7eUBBGZPMN3vsIoNLTfFdb5BSDHGPmO19MmQ9daf6ZcnXPx\nlnLHDskx3vwnRQofHhJjK/31fJpGjkx3CtW2dbk0cZrtxnj4WvAC43OK2pTKADCg\nm7xifkNWSGUawZVkq1P1vFhJnWNuQM9/AXKCVOYwoTRgk3v1ywhw8KolmdwDekyx\n3ihv6ZcLXpg0PWQdFNCCiVDFZ9vpMHefNsRdyYmet5Hopfn16PCf5Jy4utD2VQfg\nekco7Iiw+FOSzZW5kOZ0Y46D5rSjac+mPDDlyaxdAQKBgQDiuUOidZPsnS1Umjd8\nmqDxscvuvP+fopgazBq25PVgh/p1nGzoHqjfwhEjTsXpRu/sm4isnh79slYLbHOD\nzRzsGee09MVrZB6+G9tkcn2fTAmtyTIVqSbxjJ7uoIwXY/KvZhh78YjSFe9w1w49\ndgkxVtdg8vIgn1paySlWcLRugQKBgQDO/hkCgS5sX7jY/7Pzk26vmUdUevqlrtVl\nLyRAknW6cvPTaa65mvRkGy7JxFVmXzuD2Gw8ULwBRMo2DxzwnBlvYHHkzvt7HwCf\n7OdVZr0rUx3+VN/Krj7ya2F84k0Ag77cl/XTNSK5cJKrqIWOg07SYB/rzMZ3Zh0J\nRKbec9vahQKBgQDVkFfiX0jg2EmL6NyddfZm1OjZUJSlpX4Lt/juEQwGSvAk+x0n\nJUJDy8Vi8d/BVr3HrdZ3a1ab+PHOPvEs1PgKenhlXy/bcer3frwRiTtF41U2q0+P\nUc/KNoC7HOX5Xn+KsuwbTDBqXJk4PItAX8BXBotI2nAzRIfS/qv+rZl4gQKBgAIn\nbscx5PPHwzqu3oaIYDx/kdh1NyqGOT5GUVBCtersy1DF5sWTsTthdQkwe9sG3q2u\nkOHHzU0OFDSfz6NJXJJmJIlHBiLv3afMZVPkL8/Fm6hL5dBMI+eN6oPMLxT0SgYt\npqc+BFB9tWkH5evnveg+i9Z+WQphC6hPCJWECyOpAoGBAJkgeCMBUYiuhorAn/g7\n2YqZMH6ff/cK+v//Oc50N4ae4nuAiUhTsdMFBFmqwxySeZXC4tgrwG8kpVTVuOnE\nPMgVH02HTmVZplghGgM8SDOYjH/hK6EY+PSD2fHxJL59nMmue8FXn1g38Qxe0vC7\ntkAQ9JW6rpFIrQjJ66pwAF4S\n-----END PRIVATE KEY-----\n",
+  "client_email": "fpl-fun-owner@fpl-fun.iam.gserviceaccount.com",
+  "client_id": "114983562450138590122",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fpl-fun-owner%40fpl-fun.iam.gserviceaccount.com"
+}

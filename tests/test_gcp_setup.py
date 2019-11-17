@@ -4,7 +4,7 @@ from gcloud import storage
 import google.auth
 import googleapiclient.discovery
 
-from GCP.main import FPL_BUCKET_NAME
+from gcp.main import FPL_BUCKET_NAME
 
 
 class TestGCP(unittest.TestCase):

@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-from GCP import main
+from gcp import main
 from gcloud import storage
 from gcloud.exceptions import Conflict
 
@@ -29,7 +29,7 @@ def create_requirements_txt():
 
 
 def create_get_fpl_data():
-    """Deploys get_fpl_data function to GCP Functions.
+    """Deploys get_fpl_data function to gcp Functions.
 
     :return: CompletedProcess data type
     """
@@ -43,7 +43,7 @@ def create_get_fpl_data():
 
 
 def create_create_gcp_tables():
-    """Deploys write_gcp_tables_pubsub function to GCP Functions.
+    """Deploys write_gcp_tables_pubsub function to gcp Functions.
 
     :return: CompletedProcess data type
     """
