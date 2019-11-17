@@ -25,7 +25,7 @@ import typing
 class XmlSoccerRequest(object):
     def __init__(self):
         self.api_key = os.environ['XML_SOCCER_API_KEY']
-        self.api_url = 'http://www.xmlsoccer.com/FootballDataDemo.asmx/'
+        self.api_url = 'http://www.xmlsoccer.com/FootballData.asmx/'
         self.base_params = {'ApiKey': self.api_key}
 
     def get(self, method:str='GetAllLeagues', **kwargs) -> typing.List[typing.Dict]:
@@ -57,7 +57,7 @@ class XmlSoccerRequest(object):
         return data
 
 
-def get_season_matches(league_code: str, season_date_string: str) -> pd.DataFrame:
+def get_season_matches(league_code: str, season_date_string: str):
     """Downloads matches from a particular competition and season into a dataframe.
 
     # Common competition codes
@@ -71,22 +71,23 @@ def get_season_matches(league_code: str, season_date_string: str) -> pd.DataFram
     :param season_date_string: str
     :return: df containing all of the competition season match information
     """
-    season_matches = XmlSoccerRequest().get('GetFixturesByLeagueAndSeason',
-                                            league=league_code,
-                                            seasonDateString=season_date_string)
+    season_matches_raw = XmlSoccerRequest().get('GetFixturesByLeagueAndSeason',
+                                                league=league_code,
+                                                seasonDateString=season_date_string)
 
-    season_detail_df = pd.DataFrame.from_records(season_matches)
-    season_detail_df['MatchDate'] = pd.to_datetime(season_detail_df.Date)
-    season_detail_df['CompetitionSeason'] = season_date_string
-    season_detail_df['CompetitionName'] = season_matches[0]['League']
+    # season_detail_df = pd.DataFrame.from_records(season_matches_raw)
+    # season_detail_df['MatchDate'] = pd.to_datetime(season_detail_df.Date)
+    # season_detail_df['CompetitionSeason'] = season_date_string
+    # season_detail_df['CompetitionName'] = season_matches_raw[0]['League']
 
-    return season_detail_df
+    # return season_matches_raw, season_detail_df
+    return season_matches_raw
 
 
 def process_season_matches(season_detail_df: pd.DataFrame):
     """Processes raw season match data into parsable match and table data.
 
-    :param season_matches_df: Dataframe as returned by get_season_matches function
+    :param season_detail_df: Dataframe as returned by get_season_matches function
     :return: 3 dataframes: expanded_df with match info, table_df with match outcome info, and grouped_table_df
     with a view of the league table week on week through the season
     """
@@ -149,11 +150,12 @@ def process_season_matches(season_detail_df: pd.DataFrame):
         return [home_row_data, away_row_data]
 
     season_dropped_df = season_detail_df.dropna(thresh=10)  # drop only records that are substantively blank
-    matches_df = season_dropped_df.apply(create_table_records, axis=1)
-    table_df_flat_list = [l for sublist in matches_df for l in sublist]
-    table_df = pd.DataFrame.from_records(table_df_flat_list)
+    matches_records = season_dropped_df.apply(create_table_records, axis=1)
+    table_df_flat_list = [l for sublist in matches_records for l in sublist]
+    matches_df = pd.DataFrame.from_records(table_df_flat_list)
 
-    table_grouped_df = table_df.groupby(['MatchDay', 'TeamName']).sum().groupby('TeamName').cumsum()\
+    table_df = matches_df.groupby(['MatchDay', 'TeamName']).sum().groupby('TeamName').cumsum()\
         .sort_values(by=['MatchDay', 'Points', 'GoalDiff'])
+    table_df = table_df.join(table_df.groupby('MatchDay').rank('average'), rsuffix='_Rank') # add relative ranking
 
-    return matches_df, table_df, table_grouped_df
+    return matches_df, table_df
