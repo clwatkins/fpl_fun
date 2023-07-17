@@ -7,7 +7,7 @@ authors = ["Chris Watkins <chris.watkins93@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.7"
 pandas = "^0.25.3"
-requests = "^2.22"
+requests = "^2.31"
 gcloud = "^0.18.3"
 flask = "^1.1"
 mock = "^3.0"
